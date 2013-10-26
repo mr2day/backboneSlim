@@ -23,12 +23,12 @@ $app->get('/task(/:id)', function($id = null) use($app, $db) {
 	 * We check if $id was provided If it is, then we wish to fetch single task item, else we'll fetch whole set
 	 */
 	if(null === $id){
-		
+		$projectId = $app->request()->get('project');
 		$data = array();
 		/*
 		 * We're fetching tasks and filling an array that we'll return to the client
 		 */
-		foreach($db->task() as $task){
+		foreach($db->task()->where('project_id', $projectId) as $task){
 			$data[] = array(
 				'id' 			=> $task ['id'],
 				'task' 			=> $task ['task'],
@@ -44,7 +44,7 @@ $app->get('/task(/:id)', function($id = null) use($app, $db) {
 		/*
 		 * We're fetching single task
 		 */
-		if($task = $db->task()->where('id', $id )->fetch()){
+		if($task = $db->task()->where('id', $id)->fetch()){
 			$data = array(
 				'id' 			=> $task ['id'],
 				'task' 			=> $task ['task'],
@@ -89,7 +89,7 @@ $app->post('/task', function() use($app, $db){
 	/*
 	 * Outputing request
 	 */
-	echo json_encode($data['id']);
+	echo json_encode((array)$data->getIterator());
 });
 
 /*
